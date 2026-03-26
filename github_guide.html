@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل GitHub المتكامل — mostafamr2011</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:     #0D1117;
+  --bg2:    #161B22;
+  --bg3:    #21262D;
+  --bg4:    #2D333B;
+  --border: #30363D;
+  --border2:#484F58;
+  --text:   #E6EDF3;
+  --muted:  #8B949E;
+  --muted2: #6E7681;
+  --green:  #3FB950;
+  --green2: #238636;
+  --green-bg:rgba(63,185,80,.1);
+  --blue:   #58A6FF;
+  --blue2:  #1F6FEB;
+  --blue-bg:rgba(88,166,255,.1);
+  --orange: #D29922;
+  --orange-bg:rgba(210,153,34,.12);
+  --red:    #F85149;
+  --red-bg: rgba(248,81,73,.1);
+  --purple: #BC8CFF;
+  --purple-bg:rgba(188,140,255,.1);
+  --yellow: #E3B341;
+  --cyan:   #76E3EA;
+  --r:8px;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'IBM Plex Sans Arabic',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;overflow-x:hidden}
+::selection{background:var(--blue2);color:#fff}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:6px}
+
+/* ── TOP BANNER ── */
+.banner{
+  background:linear-gradient(135deg,#0D1117 0%,#161B22 100%);
+  border-bottom:1px solid var(--border);
+  padding:48px 32px 40px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.banner::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 50%,rgba(63,185,80,.06),transparent),
+    radial-gradient(ellipse 50% 40% at 80% 30%,rgba(88,166,255,.06),transparent);
+  pointer-events:none;
+}
+.gh-logo{
+  width:56px;height:56px;margin:0 auto 20px;
+  background:var(--text);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+}
+.gh-logo svg{width:36px;fill:var(--bg)}
+.banner h1{font-size:clamp(22px,4vw,36px);font-weight:700;position:relative;z-index:1;margin-bottom:8px}
+.banner h1 em{color:var(--green);font-style:normal}
+.banner p{color:var(--muted);font-size:14px;position:relative;z-index:1;margin-bottom:20px}
+.repo-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:100px;
+  background:var(--green-bg);border:1px solid rgba(63,185,80,.3);
+  font-family:var(--mono);font-size:13px;color:var(--green);
+  position:relative;z-index:1;
+}
+.repo-chip::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:gp 2s ease-in-out infinite}
+@keyframes gp{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── PROGRESS ── */
+.progress-wrap{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:10px 24px;
+}
+.progress-inner{max-width:920px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.p-track{flex:1;height:3px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.p-fill{height:100%;background:linear-gradient(to left,var(--green),var(--blue));border-radius:3px;width:0%;transition:width .4s}
+.p-label{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.step-dots{display:flex;gap:4px}
+.sd{width:7px;height:7px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .2s;flex-shrink:0}
+.sd.done{background:var(--green);border-color:var(--green)}
+.sd.active{background:var(--blue);border-color:var(--blue);transform:scale(1.3)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+
+/* ── SECTION BLOCK ── */
+.sblock{
+  margin-top:32px;
+  border:1px solid var(--border);border-radius:var(--r);
+  background:var(--bg2);
+  opacity:0;transform:translateY(20px);
+  transition:opacity .5s,transform .5s;
+}
+.sblock.vis{opacity:1;transform:none}
+
+.shead{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 22px;
+  background:var(--bg3);border-bottom:1px solid var(--border);
+  border-radius:var(--r) var(--r) 0 0;
+  cursor:pointer;user-select:none;
+}
+.snum{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  flex-shrink:0;border:2px solid;
+}
+.n1{background:rgba(63,185,80,.15);color:var(--green);border-color:rgba(63,185,80,.4)}
+.n2{background:rgba(88,166,255,.15);color:var(--blue);border-color:rgba(88,166,255,.4)}
+.n3{background:rgba(210,153,34,.15);color:var(--orange);border-color:rgba(210,153,34,.4)}
+.n4{background:rgba(188,140,255,.15);color:var(--purple);border-color:rgba(188,140,255,.4)}
+.n5{background:rgba(63,185,80,.15);color:var(--green);border-color:rgba(63,185,80,.4)}
+.n6{background:rgba(88,166,255,.15);color:var(--blue);border-color:rgba(88,166,255,.4)}
+.n7{background:rgba(248,81,73,.15);color:var(--red);border-color:rgba(248,81,73,.4)}
+.n8{background:rgba(118,227,234,.15);color:var(--cyan);border-color:rgba(118,227,234,.4)}
+
+.shead-text h2{font-size:16px;font-weight:600;color:var(--text)}
+.shead-text p{font-size:12px;color:var(--muted);margin-top:2px}
+.schevron{margin-inline-start:auto;color:var(--muted);transition:transform .3s;flex-shrink:0}
+.sblock.open .schevron{transform:rotate(180deg)}
+.sbody{padding:22px;display:none}
+.sblock.open .sbody{display:block}
+
+/* ── TERMINAL ── */
+.term{
+  background:#010409;border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin:14px 0;
+}
+.term-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);
+}
+.term-dots{display:flex;gap:5px}
+.td{width:10px;height:10px;border-radius:50%}
+.td:nth-child(1){background:#FF5F57}
+.td:nth-child(2){background:#FEBC2E}
+.td:nth-child(3){background:#28C840}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--muted);flex:1;text-align:center}
+.copy-btn{
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;padding:3px 10px;
+  border-radius:5px;cursor:pointer;font-family:var(--sans);
+  transition:all .2s;white-space:nowrap;
+}
+.copy-btn:hover{background:var(--bg3);color:var(--text)}
+.copy-btn.ok{color:var(--green);border-color:rgba(63,185,80,.4)}
+.term-body{
+  padding:16px;font-family:var(--mono);font-size:13px;
+  line-height:2;direction:ltr;text-align:left;overflow-x:auto;
+}
+.p{color:#4CAF50}   /* prompt */
+.c{color:#58A6FF}   /* command */
+.s{color:#A5D6FF}   /* string/arg */
+.k{color:#FF7B72}   /* keyword */
+.cm{color:#6E7681}  /* comment */
+.v{color:#79C0FF}   /* variable */
+.o{color:#3FB950}   /* output */
+.w{color:#E3B341}   /* warning */
+.e{color:#F85149}   /* error */
+.h{color:#BC8CFF}   /* highlight */
+
+/* ── INFO BOXES ── */
+.info{border-radius:7px;padding:14px 16px;margin:12px 0;display:flex;gap:10px;font-size:13.5px;line-height:1.7}
+.ico{font-size:17px;flex-shrink:0;margin-top:1px}
+.i-green{background:var(--green-bg);border:1px solid rgba(63,185,80,.25)}
+.i-blue {background:var(--blue-bg); border:1px solid rgba(88,166,255,.25)}
+.i-orange{background:var(--orange-bg);border:1px solid rgba(210,153,34,.3)}
+.i-red   {background:var(--red-bg);  border:1px solid rgba(248,81,73,.25)}
+.i-purple{background:var(--purple-bg);border:1px solid rgba(188,140,255,.25)}
+.info b{color:var(--text)}
+
+/* ── CHECKLIST ── */
+.clist{list-style:none}
+.clist li{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid rgba(48,54,61,.5);
+  font-size:13.5px;
+}
+.clist li:last-child{border:none}
+.ck{
+  width:20px;height:20px;border-radius:5px;border:1px solid var(--border2);
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;margin-top:2px;transition:all .2s;
+}
+.ck:hover{border-color:var(--green)}
+.ck.done{background:var(--green2);border-color:var(--green)}
+.ck.done::after{content:'✓';color:white;font-size:11px;font-weight:700}
+.ck-t strong{color:var(--text);display:block;margin-bottom:2px}
+.ck-t span{color:var(--muted);font-size:12.5px}
+
+/* ── UI MOCKUP ── */
+.mockup{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin:14px 0}
+.mbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#010409;border-bottom:1px solid var(--border)}
+.murl{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 12px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center}
+.mbody{padding:18px}
+
+/* ── FLOW DIAGRAM ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:16px 0}
+.fs{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:7px;padding:10px 16px;
+  font-size:13px;text-align:center;min-width:110px;
+  transition:border-color .2s;
+}
+.fs:hover{border-color:var(--green)}
+.fs small{color:var(--muted);font-size:11px;display:block}
+.fa{color:var(--muted);font-size:18px;padding:0 6px;flex-shrink:0}
+.fs.ac{border-color:var(--green);background:rgba(63,185,80,.06)}
+.fs.ac small{color:var(--green)}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+.tbl th{background:var(--bg3);padding:10px 14px;text-align:right;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border);font-weight:600}
+.tbl td{padding:11px 14px;border-bottom:1px solid rgba(48,54,61,.4);vertical-align:top;line-height:1.6}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600}
+.bg-green{background:var(--green-bg);color:var(--green)}
+.bg-blue {background:var(--blue-bg); color:var(--blue)}
+.bg-orange{background:var(--orange-bg);color:var(--orange)}
+.bg-red  {background:var(--red-bg);  color:var(--red)}
+
+/* ── SPECIAL: TOKEN GUIDE ── */
+.token-steps{display:grid;gap:14px}
+.ts{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)}
+.ts-num{width:30px;height:30px;border-radius:50%;background:var(--blue-bg);border:1px solid rgba(88,166,255,.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--blue);flex-shrink:0}
+.ts h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ts p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── BRANCH VISUAL ── */
+.branch-vis{background:#010409;border:1px solid var(--border);border-radius:var(--r);padding:20px;font-family:var(--mono);font-size:12.5px;line-height:2;direction:ltr;margin:14px 0}
+
+/* ── DANGER BOX ── */
+.danger{background:var(--red-bg);border:1px solid rgba(248,81,73,.3);border-radius:7px;padding:14px 16px;margin:12px 0;font-size:13.5px}
+.danger strong{color:var(--red);display:block;margin-bottom:4px}
+
+/* ── FOOTER ── */
+.site-footer{
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:28px;text-align:center;
+  color:var(--muted);font-size:12px;line-height:2;
+}
+.site-footer a{color:var(--blue);transition:color .2s}
+.site-footer a:hover{color:var(--text)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .wrap{padding:0 14px 60px}
+  .banner{padding:32px 16px 28px}
+  .flow{flex-direction:column;align-items:flex-start}
+  .fa{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<header class="banner">
+  <div class="gh-logo">
+    <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+  </div>
+  <h1>دليل <em>GitHub</em> المتكامل</h1>
+  <p>Token · Clone · Branch · Push · Pull · Merge · تطوير الموقع الحالي</p>
+  <div class="repo-chip">mostafamr2011 / index · github.io</div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="step-dots" id="dots"></div>
+    <div class="p-track"><div class="p-fill" id="pfill"></div></div>
+    <div class="p-label" id="plabel">0 / 8</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════
+     STEP 1 — PERSONAL ACCESS TOKEN
+══════════════════════════════════════════ -->
+<div class="sblock open" id="s1">
+  <div class="shead" onclick="toggle('s1')">
+    <div class="snum n1">01</div>
+    <div class="shead-text">
+      <h2>إنشاء Personal Access Token (PAT)</h2>
+      <p>مفتاحك الآمن للتواصل مع GitHub بدون كلمة مرور</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="info i-blue">
+      <span class="ico">💡</span>
+      <div><b>لماذا Token وليس كلمة المرور؟</b><br>
+      GitHub أوقف المصادقة بكلمة المرور في 2021. التوكن أكثر أماناً — يمكن تحديده بصلاحيات محددة وإلغاؤه في أي وقت.</div>
+    </div>
+
+    <div class="token-steps">
+      <div class="ts"><div class="ts-num">1</div><div><h4>افتح إعدادات GitHub</h4><p>اذهب إلى <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-family:var(--mono);color:var(--blue)">github.com → Settings</code> (أيقونة صورتك الشخصية في الأعلى يميناً)</p></div></div>
+      <div class="ts"><div class="ts-num">2</div><div><h4>Developer Settings</h4><p>في القائمة الجانبية إلى الأسفل: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-family:var(--mono);color:var(--blue)">Developer settings</code></p></div></div>
+      <div class="ts"><div class="ts-num">3</div><div><h4>Personal access tokens → Tokens (classic)</h4><p>ثم انقر <b>Generate new token → Generate new token (classic)</b></p></div></div>
+      <div class="ts"><div class="ts-num">4</div><div><h4>اضبط الصلاحيات</h4><p>Note: <code style="font-family:var(--mono);color:var(--green)">my-index-site</code> &nbsp;·&nbsp; Expiration: 90 days &nbsp;·&nbsp; فعّل: <b>repo</b> (كل صلاحيات المستودع)</p></div></div>
+      <div class="ts"><div class="ts-num">5</div><div><h4>انسخ التوكن فوراً</h4><p>يظهر مرة واحدة فقط — احفظه في مكان آمن (Password Manager أو ملف محلي مؤقت)</p></div></div>
+    </div>
+
+    <div class="info i-orange">
+      <span class="ico">⚠️</span>
+      <div><b>التوكن يبدو هكذا:</b><br>
+      <code style="font-family:var(--mono);color:var(--orange)">ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</code><br>
+      لا تشاركه مع أحد ولا ترفعه إلى GitHub أبداً.</div>
+    </div>
+
+    <div class="info i-green">
+      <span class="ico">🔐</span>
+      <div><b>حفظ التوكن في Git Credential Manager (مرة واحدة):</b><br>
+      بعد الإعداد التالي Git سيتذكره تلقائياً.</div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — حفظ التوكن</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># اضبط Git ليحفظ بيانات الاعتماد</span>
+<span class="c">git config</span> <span class="s">--global credential.helper store</span>
+
+<span class="cm"># أو على Mac (أفضل — يحفظ في Keychain)</span>
+<span class="c">git config</span> <span class="s">--global credential.helper osxkeychain</span>
+
+<span class="cm"># على Windows</span>
+<span class="c">git config</span> <span class="s">--global credential.helper wincred</span>
+
+<span class="cm"># تأكد من اسمك وبريدك في Git</span>
+<span class="c">git config</span> <span class="s">--global user.name</span>  <span class="s">"Mostafa MR"</span>
+<span class="c">git config</span> <span class="s">--global user.email</span> <span class="s">"<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d8b5b7abacb9beb9b5aaeae8e9e998bdb5b9b1b4f6bbb7b5">[email&#160;protected]</a>"</span>
+      </div>
+    </div>
+
+    <ul class="clist" id="cl1">
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>فتحت Settings → Developer settings</strong><span>وصلت إلى صفحة Personal access tokens</span></div></li>
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>أنشأت التوكن بصلاحية repo</strong><span>نسخته وحفظته في مكان آمن</span></div></li>
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>ضبطت credential.helper في Git</strong><span>سيتذكر التوكن تلقائياً في المرات القادمة</span></div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 2 — CLONE
+══════════════════════════════════════════ -->
+<div class="sblock" id="s2">
+  <div class="shead" onclick="toggle('s2')">
+    <div class="snum n2">02</div>
+    <div class="shead-text">
+      <h2>Clone المستودع على جهازك</h2>
+      <p>نسخ مستودع mostafamr2011/index محلياً للتطوير</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="info i-blue">
+      <span class="ico">📂</span>
+      <div><b>Clone = نسخ المستودع بالكامل على جهازك</b><br>
+      تحصل على كل الملفات + كل تاريخ التعديلات. بعدها تعمل محلياً بحرية ثم ترفع التغييرات.</div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — Clone باستخدام التوكن</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># الصيغة العامة:</span>
+<span class="cm"># git clone https://<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a0e15111f141a3d332e322f3874393537">[email&#160;protected]</a>/USERNAME/REPO.git</span>
+
+<span class="c">git clone</span> <span class="s">https://<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f2959a82adaaaaaaaaaab2959b869a8790dc919d9f">[email&#160;protected]</a>/mostafamr2011/index.git</span>
+
+<span class="cm"># أو clone عادي ثم سيطلب منك التوكن كـ password</span>
+<span class="c">git clone</span> <span class="s">https://github.com/mostafamr2011/index.git</span>
+
+<span class="cm"># انتقل للمجلد</span>
+<span class="c">cd</span> index
+
+<span class="cm"># تحقق من الاتصال بالـ remote</span>
+<span class="c">git remote</span> <span class="s">-v</span>
+
+<span class="o">origin  https://github.com/mostafamr2011/index.git (fetch)</span>
+<span class="o">origin  https://github.com/mostafamr2011/index.git (push)</span>
+
+<span class="cm"># اعرض الملفات الموجودة</span>
+<span class="c">ls</span> <span class="s">-la</span>
+<span class="o">total 112</span>
+<span class="o">drwxr-xr-x  index/</span>
+<span class="o">-rw-r--r--  index.html</span>
+<span class="o">-rw-r--r--  README.md</span>
+      </div>
+    </div>
+
+    <div class="danger">
+      <strong>⚠️ لا تضع التوكن في الكود مباشرة</strong>
+      استخدمه فقط في أمر clone مرة واحدة — بعدها Git يتذكره. لا ترفعه في أي ملف إلى GitHub.
+    </div>
+
+    <ul class="clist">
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>Clone ناجح — المجلد index/ موجود على جهازك</strong><span>git remote -v يُظهر العنوان الصحيح</span></div></li>
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>ملف index.html موجود في المجلد</strong><span>هو الملف الرئيسي لموقعك</span></div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 3 — BRANCHES
+══════════════════════════════════════════ -->
+<div class="sblock" id="s3">
+  <div class="shead" onclick="toggle('s3')">
+    <div class="snum n3">03</div>
+    <div class="shead-text">
+      <h2>Branches — العمل بأمان</h2>
+      <p>القاعدة الذهبية: لا تعدّل main مباشرة</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="branch-vis">
+<span class="o">main</span>     ●─────────────────────────────────●  <span class="cm">← موقعك الحالي (لا تلمسه مباشرة)</span>
+                 \                           /
+<span class="blue">dev</span>       ●──────●──────●──────●──────●      <span class="cm">← branch تطوير</span>
+                       \
+<span class="h">feature/x</span>         ●──────●               <span class="cm">← ميزة محددة</span>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — إدارة Branches</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># اعرض كل الـ branches</span>
+<span class="c">git branch</span> <span class="s">-a</span>
+<span class="o">* main</span>
+<span class="o">  remotes/origin/main</span>
+
+<span class="cm"># أنشئ branch جديد للتطوير واذهب إليه مباشرة</span>
+<span class="c">git checkout</span> <span class="s">-b dev</span>
+<span class="o">Switched to a new branch 'dev'</span>
+
+<span class="cm"># أو بالأمر الجديد (Git 2.23+)</span>
+<span class="c">git switch</span> <span class="s">-c dev</span>
+
+<span class="cm"># تحقق أنك على dev</span>
+<span class="c">git branch</span>
+<span class="o">* dev</span>
+<span class="o">  main</span>
+
+<span class="cm"># للتنقل بين branches</span>
+<span class="c">git switch</span> <span class="s">main</span>
+<span class="c">git switch</span> <span class="s">dev</span>
+
+<span class="cm"># احذف branch بعد الدمج</span>
+<span class="c">git branch</span> <span class="s">-d feature/old</span>
+      </div>
+    </div>
+
+    <div class="info i-green">
+      <span class="ico">✅</span>
+      <div><b>استراتيجية Branches الموصى بها لموقعك:</b><br>
+      <code style="font-family:var(--mono);color:var(--green)">main</code> ← الموقع الحالي المنشور على github.io<br>
+      <code style="font-family:var(--mono);color:var(--blue)">dev</code> &nbsp;← التطوير والتجارب<br>
+      <code style="font-family:var(--mono);color:var(--purple)">feature/*</code> ← ميزات محددة (قسم جديد، تصميم، إلخ)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 4 — WORKFLOW (ADD, COMMIT, PUSH)
+══════════════════════════════════════════ -->
+<div class="sblock" id="s4">
+  <div class="shead" onclick="toggle('s4')">
+    <div class="snum n4">04</div>
+    <div class="shead-text">
+      <h2>سير العمل اليومي — Add · Commit · Push</h2>
+      <p>الدورة الكاملة من التعديل حتى الإرسال</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="flow">
+      <div class="fs ac"><span>تعديل الملف</span><small>index.html</small></div>
+      <div class="fa">←</div>
+      <div class="fs ac"><span>git add</span><small>تحديد التغييرات</small></div>
+      <div class="fa">←</div>
+      <div class="fs ac"><span>git commit</span><small>حفظ محلي</small></div>
+      <div class="fa">←</div>
+      <div class="fs ac"><span>git push</span><small>رفع لـ GitHub</small></div>
+      <div class="fa">←</div>
+      <div class="fs ac"><span>github.io</span><small>موقعك يتحدث 🚀</small></div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — الدورة الكاملة</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># تأكد أنك على branch dev</span>
+<span class="c">git switch</span> <span class="s">dev</span>
+
+<span class="cm"># بعد تعديل index.html أو أي ملف...</span>
+
+<span class="cm"># اعرض التغييرات التي لم تُحفظ بعد</span>
+<span class="c">git status</span>
+<span class="o">On branch dev</span>
+<span class="w">Changes not staged for commit:</span>
+<span class="w">  modified:   index.html</span>
+
+<span class="cm"># أضف ملفاً محدداً</span>
+<span class="c">git add</span> <span class="s">index.html</span>
+
+<span class="cm"># أو أضف كل التغييرات دفعة واحدة</span>
+<span class="c">git add</span> <span class="s">.</span>
+
+<span class="cm"># احفظ مع رسالة واضحة</span>
+<span class="c">git commit</span> <span class="s">-m</span> <span class="s">"feat: إضافة قسم OKR في التخطيط الوظيفي"</span>
+
+<span class="o">[dev a1b2c3d] feat: إضافة قسم OKR في التخطيط الوظيفي</span>
+<span class="o"> 1 file changed, 48 insertions(+), 2 deletions(-)</span>
+
+<span class="cm"># ارفع إلى GitHub (المرة الأولى: حدد الـ upstream)</span>
+<span class="c">git push</span> <span class="s">-u origin dev</span>
+
+<span class="cm"># المرات التالية فقط:</span>
+<span class="c">git push</span>
+      </div>
+    </div>
+
+    <div class="info i-blue">
+      <span class="ico">📝</span>
+      <div><b>صيغة رسائل Commit الاحترافية:</b><br>
+      <code style="font-family:var(--mono);color:var(--green)">feat:</code> &nbsp;ميزة جديدة<br>
+      <code style="font-family:var(--mono);color:var(--orange)">fix:</code> &nbsp;&nbsp;إصلاح مشكلة<br>
+      <code style="font-family:var(--mono);color:var(--blue)">style:</code> تغيير تصميمي<br>
+      <code style="font-family:var(--mono);color:var(--purple)">docs:</code> &nbsp;تحديث توثيق<br>
+      <code style="font-family:var(--mono);color:var(--red)">chore:</code> صيانة عامة</div>
+    </div>
+
+    <ul class="clist">
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>عدّلت index.html وحفظته</strong><span>git status يُظهر التغيير</span></div></li>
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>git add . ثم git commit -m "..."</strong><span>رسالة commit واضحة ومفيدة</span></div></li>
+      <li><div class="ck" onclick="chk(this)"></div><div class="ck-t"><strong>git push -u origin dev</strong><span>Branch dev ظهر على GitHub</span></div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 5 — PULL
+══════════════════════════════════════════ -->
+<div class="sblock" id="s5">
+  <div class="shead" onclick="toggle('s5')">
+    <div class="snum n5">05</div>
+    <div class="shead-text">
+      <h2>Pull — جلب آخر التحديثات</h2>
+      <p>دائماً اسحب قبل أن تبدأ العمل</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="info i-orange">
+      <span class="ico">⚡</span>
+      <div><b>القاعدة الذهبية:</b><br>
+      قبل أي عمل جديد → <code style="font-family:var(--mono);color:var(--orange)">git pull</code><br>
+      يمنع تعارض الكود ويحافظ على مستودعك محدثاً.</div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — Pull scenarios</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># جلب آخر التغييرات من main</span>
+<span class="c">git switch</span> <span class="s">main</span>
+<span class="c">git pull</span> <span class="s">origin main</span>
+<span class="o">Already up to date.</span>
+
+<span class="cm"># أو (نفس الشيء إذا ضبطت upstream)</span>
+<span class="c">git pull</span>
+
+<span class="cm"># جلب التغييرات فقط بدون دمج (أكثر أماناً)</span>
+<span class="c">git fetch</span> <span class="s">origin</span>
+<span class="c">git diff</span> <span class="s">main origin/main</span>   <span class="cm"># اعرض الفرق</span>
+<span class="c">git merge</span> <span class="s">origin/main</span>       <span class="cm"># ادمج يدوياً</span>
+
+<span class="cm"># تحديث الـ dev branch من main</span>
+<span class="c">git switch</span> <span class="s">dev</span>
+<span class="c">git pull</span> <span class="s">origin main</span>
+      </div>
+    </div>
+
+    <div class="info i-green">
+      <span class="ico">🔄</span>
+      <div><b>fetch vs pull:</b><br>
+      <code style="font-family:var(--mono);color:var(--blue)">git fetch</code> &nbsp;← يُحمّل التغييرات فقط (لا يدمج) — للفحص أولاً<br>
+      <code style="font-family:var(--mono);color:var(--green)">git pull</code> &nbsp;&nbsp;← يُحمّل ويدمج تلقائياً = fetch + merge</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 6 — MERGE + PULL REQUEST
+══════════════════════════════════════════ -->
+<div class="sblock" id="s6">
+  <div class="shead" onclick="toggle('s6')">
+    <div class="snum n6">06</div>
+    <div class="shead-text">
+      <h2>Merge · Pull Request — نشر التغييرات</h2>
+      <p>دمج dev في main لتحديث موقعك على github.io</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div style="padding:16px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)">
+        <div style="font-weight:600;margin-bottom:8px;color:var(--blue)">Merge مباشر (محلي)</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">مناسب إذا تعمل وحدك على المشروع. أسرع وأبسط.</div>
+      </div>
+      <div style="padding:16px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)">
+        <div style="font-weight:600;margin-bottom:8px;color:var(--green)">Pull Request (PR)</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7">عبر GitHub — يمنحك فرصة مراجعة التغييرات قبل الدمج.</div>
+      </div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Terminal — Merge محلي (الطريقة السريعة)</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># 1. اذهب لـ main</span>
+<span class="c">git switch</span> <span class="s">main</span>
+
+<span class="cm"># 2. تأكد أنه محدث</span>
+<span class="c">git pull</span> <span class="s">origin main</span>
+
+<span class="cm"># 3. ادمج dev في main</span>
+<span class="c">git merge</span> <span class="s">dev</span>
+<span class="o">Updating a1b2c3d..e4f5g6h</span>
+<span class="o">Fast-forward</span>
+<span class="o"> index.html | 48 +++++++++++++++++++++++++++++</span>
+<span class="o"> 1 file changed, 48 insertions(+)</span>
+
+<span class="cm"># 4. ارفع main إلى GitHub → يتحدث github.io تلقائياً</span>
+<span class="c">git push</span> <span class="s">origin main</span>
+<span class="o">To https://github.com/mostafamr2011/index.git</span>
+<span class="o">   a1b2c3d..e4f5g6h  main -> main</span>
+
+<span class="cm"># 5. احذف dev بعد الدمج (اختياري)</span>
+<span class="c">git branch</span> <span class="s">-d dev</span>
+      </div>
+    </div>
+
+    <div class="term" style="margin-top:20px">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Pull Request — عبر GitHub UI</span></div>
+      <div class="term-body" style="direction:rtl;text-align:right;font-family:var(--sans);color:var(--muted)">
+<span style="color:var(--green)">①</span>  بعد git push origin dev — اذهب إلى github.com/mostafamr2011/index
+<span style="color:var(--green)">②</span>  ستظهر رسالة صفراء: <span style="color:var(--yellow)">"dev had recent pushes — Compare & pull request"</span>
+<span style="color:var(--green)">③</span>  انقر "Compare & pull request"
+<span style="color:var(--green)">④</span>  اكتب وصفاً للتغييرات → "Create pull request"
+<span style="color:var(--green)">⑤</span>  راجع الـ diff → "Merge pull request" → "Confirm merge"
+<span style="color:var(--green)">⑥</span>  انتظر 1-2 دقيقة → <span style="color:var(--blue)">mostafamr2011.github.io/index/</span> يتحدث 🚀
+      </div>
+    </div>
+
+    <div class="info i-purple">
+      <span class="ico">🔀</span>
+      <div><b>حل تعارض Merge Conflict:</b><br>
+      إذا عدّلت نفس السطر في branch مختلفين، Git يطلب منك الاختيار يدوياً. افتح الملف — ستجد:
+      <code style="display:block;margin-top:6px;font-family:var(--mono);color:var(--red);font-size:12px">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+التعديل من main
+=======
+التعديل من dev
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; dev</code>
+      احذف ما لا تريده + العلامات → <code style="font-family:var(--mono)">git add . && git commit</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 7 — DEVELOP SITE
+══════════════════════════════════════════ -->
+<div class="sblock" id="s7">
+  <div class="shead" onclick="toggle('s7')">
+    <div class="snum n7">07</div>
+    <div class="shead-text">
+      <h2>تطوير الموقع — ما الذي تضيفه؟</h2>
+      <p>أفكار تطوير فعلية لموقع mostafamr2011.github.io/index</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="info i-green">
+      <span class="ico">🌐</span>
+      <div><b>رأيت موقعك على:</b> <a href="https://mostafamr2011.github.io/index/" target="_blank" style="color:var(--blue)">mostafamr2011.github.io/index/</a><br>
+      الموقع شغّال ✅ — الدليل المهني التفاعلي يعمل بشكل ممتاز. إليك ما يمكن إضافته:</div>
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>التطوير</th><th>الأولوية</th><th>الصعوبة</th><th>التأثير</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ربط Google Analytics G-XXXXXXXXXX</strong><br><span style="color:var(--muted);font-size:12px">استبدال ID المؤقت بالحقيقي</span></td><td><span class="badge bg-red">عاجل</span></td><td><span class="badge bg-green">سهل</span></td><td>معرفة عدد الزوار</td></tr>
+        <tr><td><strong>إضافة ملف _config.yml لـ Jekyll SEO</strong><br><span style="color:var(--muted);font-size:12px">title, description, author</span></td><td><span class="badge bg-orange">مهم</span></td><td><span class="badge bg-green">سهل</span></td><td>ظهور أفضل في جوجل</td></tr>
+        <tr><td><strong>إضافة meta og: (Open Graph)</strong><br><span style="color:var(--muted);font-size:12px">صورة وعنوان عند المشاركة في واتساب/تويتر</span></td><td><span class="badge bg-orange">مهم</span></td><td><span class="badge bg-green">سهل</span></td><td>مشاركة أجمل</td></tr>
+        <tr><td><strong>صفحة 404 مخصصة</strong><br><span style="color:var(--muted);font-size:12px">ملف 404.html</span></td><td><span class="badge bg-blue">عادي</span></td><td><span class="badge bg-green">سهل</span></td><td>تجربة مستخدم أفضل</td></tr>
+        <tr><td><strong>قسم "التواصل" مع نموذج Formspree</strong><br><span style="color:var(--muted);font-size:12px">استقبال رسائل بدون backend</span></td><td><span class="badge bg-blue">عادي</span></td><td><span class="badge bg-orange">متوسط</span></td><td>تفاعل مع الزوار</td></tr>
+        <tr><td><strong>وضع فاتح/داكن (Dark/Light toggle)</strong><br><span style="color:var(--muted);font-size:12px">CSS custom properties + localStorage</span></td><td><span class="badge bg-blue">عادي</span></td><td><span class="badge bg-orange">متوسط</span></td><td>تجربة مستخدم ممتازة</td></tr>
+        <tr><td><strong>دعم اللغة الإنجليزية</strong><br><span style="color:var(--muted);font-size:12px">bilingual toggle (مثل الموقع الجديد)</span></td><td><span class="badge bg-blue">عادي</span></td><td><span class="badge bg-red">يحتاج وقت</span></td><td>جمهور عالمي</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:14px;font-weight:600;margin:20px 0 12px;color:var(--text)">🚀 التحديث الأسرع — ربط GA4 الآن:</h3>
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">index.html — ابحث واستبدل</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm"># في Terminal</span>
+<span class="c">cd</span> index
+<span class="c">git switch</span> <span class="s">dev</span>
+
+<span class="cm"># ابحث عن G-XXXXXXXXXX وعدّده يدوياً في محررك</span>
+<span class="cm"># أو عبر sed (Mac/Linux):</span>
+<span class="c">sed</span> <span class="s">-i</span> <span class="s">''</span> <span class="s">'s/G-XXXXXXXXXX/G-REALID123/g'</span> index.html
+
+<span class="cm"># تحقق من التغيير</span>
+<span class="c">grep</span> <span class="s">"G-"</span> index.html
+
+<span class="cm"># احفظ وارفع</span>
+<span class="c">git add</span> index.html
+<span class="c">git commit</span> <span class="s">-m</span> <span class="s">"feat: ربط Google Analytics G-REALID123"</span>
+<span class="c">git push</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEP 8 — CHEATSHEET
+══════════════════════════════════════════ -->
+<div class="sblock" id="s8">
+  <div class="shead" onclick="toggle('s8')">
+    <div class="snum n8">08</div>
+    <div class="shead-text">
+      <h2>Cheat Sheet — مرجع سريع يومي</h2>
+      <p>الأوامر الأكثر استخداماً في مكان واحد</p>
+    </div>
+    <svg class="schevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="sbody">
+
+    <div class="term">
+      <div class="term-bar"><div class="term-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="term-title">Git Cheat Sheet — mostafamr2011/index</span><button class="copy-btn" onclick="cp(this)">📋 نسخ</button></div>
+      <div class="term-body">
+<span class="cm">## ── SETUP ─────────────────────────────────────────────</span>
+<span class="c">git clone</span> <span class="s">https://<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a6e75717f747a5d534e524f5814595557">[email&#160;protected]</a>/mostafamr2011/index.git</span>
+<span class="c">cd</span> index
+
+<span class="cm">## ── DAILY START ───────────────────────────────────────</span>
+<span class="c">git switch</span> <span class="s">dev</span>                    <span class="cm"># اذهب لـ branch التطوير</span>
+<span class="c">git pull</span> <span class="s">origin main</span>             <span class="cm"># جلّب آخر التحديثات</span>
+
+<span class="cm">## ── WORK ──────────────────────────────────────────────</span>
+<span class="cm"># عدّل index.html في محررك...</span>
+<span class="c">git status</span>                        <span class="cm"># شاهد التغييرات</span>
+<span class="c">git diff</span>                          <span class="cm"># شاهد التفاصيل سطراً سطراً</span>
+<span class="c">git add</span> <span class="s">.</span>                         <span class="cm"># أضف كل التغييرات</span>
+<span class="c">git commit</span> <span class="s">-m</span> <span class="s">"feat: وصف التعديل"</span>  <span class="cm"># احفظ</span>
+<span class="c">git push</span>                          <span class="cm"># ارفع</span>
+
+<span class="cm">## ── PUBLISH (dev → main → github.io) ─────────────────</span>
+<span class="c">git switch</span> <span class="s">main</span>
+<span class="c">git pull</span> <span class="s">origin main</span>
+<span class="c">git merge</span> <span class="s">dev</span>
+<span class="c">git push</span> <span class="s">origin main</span>             <span class="cm"># ← github.io يتحدث خلال 2 دقيقة</span>
+
+<span class="cm">## ── UNDO ──────────────────────────────────────────────</span>
+<span class="c">git restore</span> <span class="s">index.html</span>           <span class="cm"># تراجع عن تعديلات غير محفوظة</span>
+<span class="c">git reset</span> <span class="s">HEAD~1</span>                 <span class="cm"># تراجع عن آخر commit (يحتفظ بالتعديلات)</span>
+<span class="c">git reset</span> <span class="s">--hard HEAD~1</span>          <span class="cm"># ⚠️ حذف آخر commit والتعديلات</span>
+
+<span class="cm">## ── INFO ──────────────────────────────────────────────</span>
+<span class="c">git log</span> <span class="s">--oneline</span>                <span class="cm"># سجل التعديلات مختصر</span>
+<span class="c">git log</span> <span class="s">--oneline --graph</span>         <span class="cm"># رسم بياني للـ branches</span>
+<span class="c">git branch</span> <span class="s">-a</span>                    <span class="cm"># كل الـ branches</span>
+<span class="c">git remote</span> <span class="s">-v</span>                    <span class="cm"># عنوان المستودع البعيد</span>
+<span class="c">git stash</span>                        <span class="cm"># احفظ تعديلات مؤقتاً بدون commit</span>
+<span class="c">git stash pop</span>                    <span class="cm"># استعد التعديلات المحفوظة</span>
+      </div>
+    </div>
+
+    <div class="info i-green" style="margin-top:20px">
+      <span class="ico">🎯</span>
+      <div><b>الروتين اليومي في 5 أوامر:</b><br>
+      <code style="font-family:var(--mono);color:var(--green)">git switch dev</code> →
+      <code style="font-family:var(--mono);color:var(--blue)">git pull</code> →
+      <span style="color:var(--muted)">عدّل الملف</span> →
+      <code style="font-family:var(--mono);color:var(--orange)">git add . && git commit -m "..."</code> →
+      <code style="font-family:var(--mono);color:var(--purple)">git push</code></div>
+    </div>
+
+    <div style="margin-top:24px;text-align:center;padding:20px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">موقعك الحالي</div>
+      <a href="https://mostafamr2011.github.io/index/" target="_blank" style="color:var(--blue);font-family:var(--mono);font-size:15px;font-weight:600">mostafamr2011.github.io/index/</a>
+      <div style="margin-top:10px">
+        <span class="badge bg-green" style="font-size:12px">✓ منشور</span>
+        <span class="badge bg-blue" style="font-size:12px;margin-inline-start:6px">GitHub Pages</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<footer class="site-footer">
+  <div>دليل Git لمستودع <a href="https://github.com/mostafamr2011/index" target="_blank">mostafamr2011/index</a></div>
+  <div style="color:var(--muted2)">Token · Clone · Branch · Commit · Push · Pull · Merge</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+'use strict';
+var TOTAL = 8;
+
+// Build dots
+var dotsEl = document.getElementById('dots');
+for (var i = 1; i <= TOTAL; i++) {
+  var d = document.createElement('div');
+  d.className = 'sd';
+  d.id = 'dot-' + i;
+  d.setAttribute('title', 'خطوة ' + i);
+  (function(n) {
+    d.addEventListener('click', function() {
+      var el = document.getElementById('s' + n);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  })(i);
+  dotsEl.appendChild(d);
+}
+
+// Toggle section
+function toggle(id) {
+  var el = document.getElementById(id);
+  el.classList.toggle('open');
+  updateProgress();
+}
+window.toggle = toggle;
+
+// Intersection observer — reveal + track
+var visited = {};
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('vis');
+      var id = e.target.id;
+      if (id) {
+        var n = parseInt(id.replace('s', ''));
+        if (!isNaN(n)) visited[n] = true;
+        updateProgress();
+      }
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.sblock').forEach(function(el) { obs.observe(el); });
+
+function updateProgress() {
+  var done = Object.keys(visited).length;
+  var pct = (done / TOTAL) * 100;
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('plabel').textContent = done + ' / ' + TOTAL;
+  for (var i = 1; i <= TOTAL; i++) {
+    var dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('done', 'active');
+    if (visited[i]) dot.classList.add('done');
+  }
+  // Mark active (highest visible)
+  var max = Math.max.apply(null, Object.keys(visited).map(Number));
+  if (max && !visited[max + 1]) {
+    var aD = document.getElementById('dot-' + max);
+    if (aD && !aD.classList.contains('done')) { /* fine */ }
+    else if (aD) aD.classList.add('active');
+  }
+}
+
+// Checkbox
+function chk(el) { el.classList.toggle('done'); updateProgress(); }
+window.chk = chk;
+
+// Copy terminal content
+function cp(btn) {
+  var body = btn.closest('.term').querySelector('.term-body');
+  navigator.clipboard.writeText(body.innerText).then(function() {
+    btn.textContent = '✅ تم';
+    btn.classList.add('ok');
+    setTimeout(function() { btn.textContent = '📋 نسخ'; btn.classList.remove('ok'); }, 2000);

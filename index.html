@@ -911,41 +911,34 @@
       }
     }, true);
 
-    /* 3 ── Text selection — disabled except in form fields ────────── */
-    var noSel = document.createElement('style');
-    noSel.id  = '__nosel';
-    noSel.textContent =
-      '*, *::before, *::after {' +
-        '-webkit-user-select: none !important;' +
-        '-moz-user-select:    none !important;' +
-        '-ms-user-select:     none !important;' +
-        'user-select:         none !important;' +
-      '}' +
-      'input, textarea, [contenteditable="true"] {' +
-        '-webkit-user-select: text !important;' +
-        'user-select:         text !important;' +
-      '}';
-    document.head.appendChild(noSel);
+    /* 3 ── Text selection — disabled after page renders ──────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+      var noSel = document.createElement('style');
+      noSel.id  = '__nosel';
+      noSel.textContent =
+        '*, *::before, *::after {' +
+          '-webkit-user-select: none !important;' +
+          '-moz-user-select:    none !important;' +
+          '-ms-user-select:     none !important;' +
+          'user-select:         none !important;' +
+        '}' +
+        'input, textarea, [contenteditable="true"] {' +
+          '-webkit-user-select: text !important;' +
+          'user-select:         text !important;' +
+        '}';
+      document.head.appendChild(noSel);
+    });
 
     /* 4 ── Drag prevention ─────────────────────────────────────────── */
     document.addEventListener('dragstart', function (e) {
       e.preventDefault();
       return false;
     }, true);
-
-    /* 5 ── iframe / frame-busting (JS layer on top of meta header) ── */
-    try {
-      if (window.self !== window.top) {
-        window.top.location.replace(window.self.location.href);
-      }
+    /* 5 ── iframe protection: handled by X-Frame-Options meta header */
     } catch (err) {
-      // Cross-origin parent — blank the page
-      document.documentElement.innerHTML =
-        '<body style="margin:0;background:#000;color:#fff;display:flex;' +
-        'align-items:center;justify-content:center;height:100vh;font-family:sans-serif">' +
-        '<p>❌ هذه الصفحة لا يمكن تضمينها.</p></body>';
+      // Cross-origin parent (e.g. preview tools) — do NOT wipe the page.
+      // The X-Frame-Options: DENY meta header handles real attack scenarios.
     }
-
     /* 6 ── Console fingerprint ─────────────────────────────────────── */
     /* Runs after DOM is ready so styles apply */
     document.addEventListener('DOMContentLoaded', function () {
