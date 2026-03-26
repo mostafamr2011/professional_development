@@ -758,7 +758,7 @@
   <!-- ① Content Security Policy ─────────────────────────────────────────
        Whitelist only the domains this page actually needs.
        'unsafe-inline' on style-src is needed for inline styles.          -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; frame-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;">
 
   <!-- ② Clickjacking / iframe protection ────────────────────────────── -->
   <meta http-equiv="X-Frame-Options" content="DENY">
@@ -782,180 +782,6 @@
        ③ Replace BOTH occurrences of G-XXXXXXXXXX below
        ════════════════════════════════════════════════════════════════ -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-  (function () {
-    'use strict';
-
-    /* ── GA4 core ─────────────────────────────────────────────────── */
-    var GA_ID = 'G-XXXXXXXXXX';           // ← YOUR MEASUREMENT ID HERE
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-
-    // Consent mode v2 — GDPR-friendly defaults
-    gtag('consent', 'default', {
-      analytics_storage: 'granted',       // flip to 'denied' + add cookie banner if needed
-      ad_storage:        'denied',
-      ad_user_data:      'denied',
-      ad_personalization:'denied',
-      wait_for_update:    500
-    });
-
-    gtag('js', new Date());
-    gtag('config', GA_ID, {
-      anonymize_ip:                        true,   // mask last IP octet
-      allow_google_signals:                false,  // no cross-device tracking
-      allow_ad_personalization_signals:    false,  // no ad profiling
-      send_page_view:                      true,
-      page_title:                          document.title,
-      page_location:                       window.location.href
-    });
-
-    /* ── Custom event helpers ─────────────────────────────────────── */
-    var _fired  = {};   // scroll milestones guard
-    var _start  = Date.now();
-
-    function trackEvent(name, params) {
-      try { gtag('event', name, params || {}); } catch (e) {}
-    }
-
-    // Scroll depth — fires at 25 / 50 / 75 / 90 / 100 %
-    window.addEventListener('scroll', function () {
-      var total = document.body.scrollHeight - window.innerHeight;
-      if (total <= 0) return;
-      var pct   = Math.round((window.scrollY / total) * 100);
-      [25, 50, 75, 90, 100].forEach(function (m) {
-        if (pct >= m && !_fired[m]) {
-          _fired[m] = true;
-          trackEvent('scroll_depth', { depth_pct: m, page: document.title });
-        }
-      });
-    }, { passive: true });
-
-    // Time on page — sent on tab close / navigation away
-    window.addEventListener('beforeunload', function () {
-      trackEvent('time_on_page', {
-        seconds: Math.round((Date.now() - _start) / 1000),
-        page:    document.title
-      });
-    });
-
-    // Outbound link clicks
-    document.addEventListener('click', function (e) {
-      var a = e.target.closest('a[href]');
-      if (!a) return;
-      var href = a.getAttribute('href') || '';
-      if (/^(https?:)?\/\//.test(href) && href.indexOf(location.hostname) === -1) {
-        trackEvent('outbound_click', { url: href });
-      }
-    });
-
-    // DevTools heuristic — fires once per session
-    var _devOpen = false;
-    setInterval(function () {
-      var open = (window.outerWidth  - window.innerWidth  > 160) ||
-                 (window.outerHeight - window.innerHeight > 160);
-      if (open && !_devOpen) {
-        _devOpen = true;
-        trackEvent('devtools_detected', { page: document.title });
-      }
-      if (!open) _devOpen = false;
-    }, 2000);
-
-  }());
-  </script>
-
-  <!-- ══════════════════════════════════════════════════════════════════
-       SECURITY RUNTIME  —  JS-layer content protection
-       Covers: right-click · text-select · keyboard shortcuts · iframe
-       ════════════════════════════════════════════════════════════════ -->
-  <script>
-  (function () {
-    'use strict';
-
-    /* 1 ── Right-click context menu ──────────────────────────────── */
-    document.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }, true);
-
-    /* 2 ── Block dangerous keyboard shortcuts ──────────────────────
-          Ctrl/Cmd + U  → view source
-          Ctrl/Cmd + S  → save page
-          Ctrl/Cmd + P  → print
-          Ctrl/Cmd + A  → select all
-          Ctrl/Cmd + C  → copy  (allow in inputs)
-          Ctrl/Cmd + Shift + I / J  → DevTools
-          F12           → DevTools                                     */
-    document.addEventListener('keydown', function (e) {
-      var ctrl = e.ctrlKey || e.metaKey;
-      var k    = e.key ? e.key.toLowerCase() : '';
-      var tag  = document.activeElement ? document.activeElement.tagName : '';
-      var editable = ['INPUT','TEXTAREA','SELECT'].indexOf(tag) !== -1 ||
-                     document.activeElement.isContentEditable;
-
-      if (e.key === 'F12') { e.preventDefault(); return false; }
-
-      if (ctrl) {
-        if (['u','s','p'].indexOf(k) !== -1) {
-          e.preventDefault(); return false;
-        }
-        // Allow Ctrl+A / Ctrl+C only inside form fields
-        if (['a','c'].indexOf(k) !== -1 && !editable) {
-          e.preventDefault(); return false;
-        }
-        if (e.shiftKey && ['i','j','c'].indexOf(k) !== -1) {
-          e.preventDefault(); return false;
-        }
-      }
-    }, true);
-
-    /* 3 ── Text selection — disabled after page renders ──────────── */
-    document.addEventListener('DOMContentLoaded', function () {
-      var noSel = document.createElement('style');
-      noSel.id  = '__nosel';
-      noSel.textContent =
-        '*, *::before, *::after {' +
-          '-webkit-user-select: none !important;' +
-          '-moz-user-select:    none !important;' +
-          '-ms-user-select:     none !important;' +
-          'user-select:         none !important;' +
-        '}' +
-        'input, textarea, [contenteditable="true"] {' +
-          '-webkit-user-select: text !important;' +
-          'user-select:         text !important;' +
-        '}';
-      document.head.appendChild(noSel);
-    });
-
-    /* 4 ── Drag prevention ─────────────────────────────────────────── */
-    document.addEventListener('dragstart', function (e) {
-      e.preventDefault();
-      return false;
-    }, true);
-    /* 5 ── iframe protection: handled by X-Frame-Options meta header */
-    } catch (err) {
-      // Cross-origin parent (e.g. preview tools) — do NOT wipe the page.
-      // The X-Frame-Options: DENY meta header handles real attack scenarios.
-    }
-    /* 6 ── Console fingerprint ─────────────────────────────────────── */
-    /* Runs after DOM is ready so styles apply */
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log(
-        '%c⛔  محتوى محمي',
-        'background:#0d1117;color:#f85149;font-size:20px;font-weight:900;' +
-        'padding:8px 16px;border-radius:6px;border:1px solid #f85149'
-      );
-      console.log(
-        '%cهذه الصفحة محمية بموجب حقوق النشر.\n' +
-        'أي محاولة لنسخ المحتوى أو فحص الكود مرصودة وتُسجَّل.',
-        'color:#8b949e;font-size:13px'
-      );
-    });
-
-  }());
-  </script>
 
 </head>
 <body>
@@ -1422,5 +1248,74 @@ cells.forEach(cell => {
   });
 });
 </script>
+
+<!-- ── GA4 Analytics ─────────────────────────────────────── -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXXX', {
+  anonymize_ip: true,
+  allow_google_signals: false,
+  allow_ad_personalization_signals: false
+});
+
+// Scroll depth tracking
+var _sd = {};
+window.addEventListener('scroll', function(){
+  var h = document.body.scrollHeight - window.innerHeight;
+  if(h <= 0) return;
+  var p = Math.round((window.scrollY/h)*100);
+  [25,50,75,90,100].forEach(function(m){
+    if(p>=m && !_sd[m]){ _sd[m]=1; gtag('event','scroll_depth',{depth_pct:m}); }
+  });
+}, {passive:true});
+
+// Time on page
+var _t = Date.now();
+window.addEventListener('beforeunload', function(){
+  gtag('event','time_on_page',{seconds:Math.round((Date.now()-_t)/1000)});
+});
+</script>
+
+<!-- ── Content Protection (runs after page renders) ─────── -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+  // Disable right-click
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, true);
+
+  // Block view-source / save / print / devtools shortcuts
+  document.addEventListener('keydown', function(e){
+    var ctrl = e.ctrlKey || e.metaKey;
+    var k = (e.key||'').toLowerCase();
+    var editable = ['INPUT','TEXTAREA','SELECT'].indexOf(
+      (document.activeElement||{}).tagName||''
+    ) !== -1 || (document.activeElement||{}).isContentEditable;
+    if(e.key==='F12'){ e.preventDefault(); return false; }
+    if(ctrl){
+      if(['u','s','p'].indexOf(k)!==-1){ e.preventDefault(); return false; }
+      if(['a','c'].indexOf(k)!==-1 && !editable){ e.preventDefault(); return false; }
+      if(e.shiftKey && ['i','j'].indexOf(k)!==-1){ e.preventDefault(); return false; }
+    }
+  }, true);
+
+  // Disable drag
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); }, true);
+
+  // Disable text selection (CSS)
+  var s = document.createElement('style');
+  s.textContent = '* { -webkit-user-select:none!important; user-select:none!important; } '
+    + 'input,textarea,[contenteditable="true"]{ -webkit-user-select:text!important; user-select:text!important; }';
+  document.head.appendChild(s);
+
+  // Console warning
+  console.log('%c⛔ محتوى محمي','color:#f85149;font-size:18px;font-weight:900');
+  console.log('%cهذه الصفحة محمية — أي محاولة لفحص الكود مرصودة.','color:#8b949e;font-size:13px');
+
+});
+</script>
+
 </body>
 </html>
